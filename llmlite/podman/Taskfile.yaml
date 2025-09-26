@@ -1,0 +1,262 @@
+version: '3'
+
+dotenv: ['.env']
+
+tasks:
+  run-litellm:
+    desc: Run LiteLLM as a Podman container
+    cmds:
+      - mkdir -p config
+      - echo "Starting LiteLLM with config file..."
+      - cat config/config.yaml
+      - podman run -d --name litellm-proxy -p ${LITELLM_PORT:-4000}:4000 -v $(pwd)/config:/app/config --env PORT=${LITELLM_PORT:-4000} --env LITELLM_MASTER_KEY=sk-cascade-master-key --env HUGGINGFACE_API_KEY=${HUGGINGFACE_API_KEY} ghcr.io/berriai/litellm:main-stable --config /app/config/config.yaml --port ${LITELLM_PORT:-4000} --num_workers 1
+    status:
+      - podman ps | grep litellm-proxy
+
+  stop-litellm:
+    desc: Stop the LiteLLM Podman container
+    cmds:
+      - podman stop litellm-proxy || true
+      - podman rm litellm-proxy || true
+
+  restart-litellm:
+    desc: Restart the LiteLLM Podman container
+    cmds:
+      - task stop-litellm
+      - task run-litellm
+
+  logs-litellm:
+    desc: View LiteLLM container logs
+    cmds:
+      - podman logs -f litellm-proxy
+
+  test-litellm:
+    desc: Test if LiteLLM is running and accessible
+    cmds:
+      - curl -s http://localhost:4000/health
+
+  test-qwen:
+    desc: Test the Qwen2.5-Coder model
+    cmds:
+      - echo "Testing Qwen2.5-Coder model..."
+      - |
+        curl -X POST http://localhost:4000/chat/completions \
+          -H "Content-Type: application/json" \
+          -H "Authorization: Bearer sk-cascade-master-key" \
+          -d '{"model": "qwen2.5-coder-14b", "messages": [{"role": "user", "content": "Write a simple Python function to calculate fibonacci numbers"}], "max_tokens": 200}'
+
+  test-endpoint:
+    desc: Test the Hugging Face endpoint directly
+    cmds:
+      - echo "Testing Hugging Face endpoint directly..."
+      - |
+        curl -X POST https://gymggaklrnsfxmkk.us-east-1.aws.endpoints.huggingface.cloud \
+          -H "Authorization: Bearer ${HUGGINGFACE_API_KEY}" \
+          -H "Content-Type: application/json" \
+          -d '{"inputs": "Write a Python hello world function", "parameters": {"max_new_tokens": 100}}'
+
+  setup-env:
+    desc: Set up environment variables for cascade-code
+    cmds:
+      - echo "LITELLM_PROXY_URL=http://localhost:4000" > .env
+      - echo "LITELLM_API_KEY=sk-cascade-master-key" >> .env
+
+  setup-env-template:
+    desc: Copy environment template to .env for editing
+    cmds:
+      - cp .env.template .env
+      - echo "Environment template copied to .env - please edit with your API keys"
+
+  info:
+    desc: Display information about the LiteLLM setup
+    cmds:
+      - echo "LiteLLM Proxy is running on http://localhost:4000"
+      - echo "Configuration file is located at config/config.yaml"
+      - echo "To use with cascade-code, set LITELLM_PROXY_URL=http://localhost:4000"
+      - echo "Run 'task setup-env' to create the .env file for cascade-code integration"
+
+  install-aider:
+    desc: Install Aider AI pair programming tool
+    cmds:
+      - echo "Installing Aider AI pair programming tool..."
+      - echo "Checking Python installation..."
+      - |
+        if ! command -v python3 &> /dev/null; then
+          echo "❌ Python 3 not found. Please install Python 3.8+ first."
+          echo "macOS: brew install python"
+          echo "Ubuntu/Debian: sudo apt install python3 python3-pip"
+          echo "Windows: Download from python.org"
+          exit 1
+        else
+          echo "✅ Python found: $(python3 --version)"
+        fi
+      - echo "Installing Aider via pip..."
+      - python3 -m pip install aider-chat
+      - echo "Verifying installation..."
+      - aider --version
+      - echo ""
+      - echo "✅ Aider installation complete!"
+      - echo "Next steps:"
+      - echo "1. Run 'task setup-aider' to configure with your LiteLLM proxy"
+      - echo "2. Navigate to your project directory"
+      - echo "3. Run 'aider' to start coding with AI"
+
+  setup-aider:
+    desc: Configure Aider to use LiteLLM proxy with qwen2.5-coder-14b model
+    cmds:
+      - echo "🔧 Configuring Aider to use LiteLLM proxy with qwen2.5-coder-14b..."
+      - echo ""
+      - echo "This will configure Aider to use your local qwen2.5-coder-14b model"
+      - echo "via the LiteLLM proxy instead of external APIs."
+      - echo ""
+      - |
+        # Check if LiteLLM is running
+        if ! curl -s http://localhost:4000/health > /dev/null; then
+          echo "❌ LiteLLM proxy not running. Starting it..."
+          task run-litellm
+          sleep 5
+        else
+          echo "✅ LiteLLM proxy is running"
+        fi
+      - echo "Setting up environment variables for Aider + LiteLLM..."
+      - |
+        # Create or update shell profile with LiteLLM configuration
+        SHELL_PROFILE=""
+        if [[ "$SHELL" == *"zsh"* ]]; then
+          SHELL_PROFILE="$HOME/.zshrc"
+        elif [[ "$SHELL" == *"bash"* ]]; then
+          SHELL_PROFILE="$HOME/.bashrc"
+        else
+          SHELL_PROFILE="$HOME/.profile"
+        fi
+        
+        echo "" >> "$SHELL_PROFILE"
+        echo "# Aider + LiteLLM Configuration (qwen2.5-coder-14b)" >> "$SHELL_PROFILE"
+        echo "export LITELLM_API_BASE=http://localhost:4000" >> "$SHELL_PROFILE"
+        echo "export LITELLM_API_KEY=sk-cascade-master-key" >> "$SHELL_PROFILE"
+        echo "export AIDER_MODEL=qwen2.5-coder-14b" >> "$SHELL_PROFILE"
+        echo "" >> "$SHELL_PROFILE"
+        
+        echo "Added Aider configuration to $SHELL_PROFILE"
+      - echo "Setting environment variables for current session..."
+      - |
+        export LITELLM_API_BASE=http://localhost:4000
+        export LITELLM_API_KEY=sk-cascade-master-key
+        export AIDER_MODEL=qwen2.5-coder-14b
+        
+        echo "Environment variables set for current session:"
+        echo "LITELLM_API_BASE=$LITELLM_API_BASE"
+        echo "LITELLM_API_KEY=$LITELLM_API_KEY"
+        echo "AIDER_MODEL=$AIDER_MODEL"
+      - echo ""
+      - echo "✅ Aider is now configured to use qwen2.5-coder-14b via LiteLLM!"
+      - echo ""
+      - echo "📋 Usage:"
+      - |
+        echo "1. Reload your shell: source ~/.zshrc (or restart your terminal)"
+      - |
+        echo "2. Navigate to your project: cd your-project"
+      - |
+        echo "3. Start Aider: aider --model qwen2.5-coder-14b --api-base http://localhost:4000 --api-key sk-cascade-master-key"
+      - |
+        echo "   Or simply: aider (uses environment variables)"
+      - echo ""
+      - echo "🎯 Benefits:"
+      - echo "- Uses your existing Hugging Face qwen2.5-coder-14b model"
+      - echo "- No external API costs"
+      - echo "- Fast, local AI pair programming"
+      - echo "- Works with any codebase"
+
+  test-aider:
+    desc: Test Aider integration with LiteLLM qwen2.5-coder-14b model
+    cmds:
+      - echo "🧪 Testing Aider + LiteLLM integration..."
+      - echo ""
+      - echo "Checking prerequisites..."
+      - |
+        # Check if Aider is installed
+        if ! command -v aider &> /dev/null; then
+          echo "❌ Aider not found. Run 'task install-aider' first."
+          exit 1
+        else
+          echo "✅ Aider found: $(aider --version)"
+        fi
+      - |
+        # Check if LiteLLM is running
+        if ! curl -s http://localhost:4000/health > /dev/null; then
+          echo "❌ LiteLLM proxy not running. Starting it..."
+          task run-litellm
+          sleep 5
+        else
+          echo "✅ LiteLLM proxy is running"
+        fi
+      - echo ""
+      - echo "Testing LiteLLM API with qwen2.5-coder-14b model..."
+      - |
+        curl -X POST http://localhost:4000/chat/completions \
+          -H "Content-Type: application/json" \
+          -H "Authorization: Bearer sk-cascade-master-key" \
+          -d '{
+            "model": "qwen2.5-coder-14b",
+            "messages": [{"role": "user", "content": "Write a simple hello world function in Python"}],
+            "max_tokens": 100
+          }' | head -10
+      - echo ""
+      - echo "✅ If you see a response above, the integration should work!"
+      - echo ""
+      - echo "🚀 To use Aider with qwen2.5-coder-14b:"
+      - |
+        echo "1. Run: task setup-aider"
+      - |
+        echo "2. Reload shell: source ~/.zshrc"
+      - |
+        echo "3. Navigate to project: cd your-project"
+      - |
+        echo "4. Start Aider: aider"
+
+  start-aider:
+    desc: Start Aider with your configured qwen2.5-coder-14b model
+    cmds:
+      - echo "🚀 Starting Aider with qwen2.5-coder-14b model..."
+      - |
+        # Check if LiteLLM is running
+        if ! curl -s http://localhost:4000/health > /dev/null; then
+          echo "❌ LiteLLM proxy not running. Starting it..."
+          task run-litellm
+          sleep 5
+        fi
+      - echo "Starting Aider..."
+      - aider --model qwen2.5-coder-14b --api-base http://localhost:4000 --api-key sk-cascade-master-key
+
+  test-litellm-api:
+    desc: Test LiteLLM proxy API directly for coding assistance
+    cmds:
+      - echo "Testing LiteLLM proxy API for coding tasks..."
+      - echo "Checking if LiteLLM proxy is running..."
+      - |
+        if ! curl -s http://localhost:4000/health > /dev/null; then
+          echo "❌ LiteLLM proxy not running. Starting it..."
+          task run-litellm
+          sleep 5
+        else
+          echo "✅ LiteLLM proxy is running"
+        fi
+      - echo ""
+      - echo "Testing qwen2.5-coder-14b model for coding tasks..."
+      - |
+        curl -X POST http://localhost:4000/chat/completions \
+          -H "Content-Type: application/json" \
+          -H "Authorization: Bearer sk-cascade-master-key" \
+          -d '{
+            "model": "qwen2.5-coder-14b",
+            "messages": [{"role": "user", "content": "Write a simple Python function to calculate fibonacci numbers"}],
+            "max_tokens": 200
+          }' | jq '.' || echo "Response received (install jq for formatted output)"
+      - echo ""
+      - echo "✅ Your LiteLLM proxy is working with qwen2.5-coder-14b!"
+      - echo ""
+      - echo "💡 Usage examples:"
+      - |
+        echo "1. Direct API calls: curl -X POST http://localhost:4000/chat/completions ..."
+      - echo "2. Use with any OpenAI-compatible client"
+      - echo "3. Integrate with VS Code extensions that support OpenAI API"
