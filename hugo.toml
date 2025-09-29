@@ -42,7 +42,7 @@ buildExpired = false
   tocopen = false
 
 [params.homeInfoParams]
-  Title = "Welcome to My Blog"
+  Title = "Humanly Studios Blog"
   Content = "A place for thoughts, ideas, and technical insights."
 
 [[params.socialIcons]]
