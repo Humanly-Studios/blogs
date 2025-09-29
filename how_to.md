@@ -219,6 +219,25 @@ task serve
 # Server running at http://localhost:1313/blogs/
 ```
 
+## Step 6: GitHub Actions Workflow Fix ✅
+
+### 6.1 Deprecated Actions Issue Resolved
+**Problem**: GitHub Actions workflow failed due to deprecated `actions/upload-pages-artifact@v2`
+**Error**: `This request has been automatically failed because it uses a deprecated version of actions/upload-artifact: v3`
+
+**Solution**: Updated all GitHub Actions to latest specific versions:
+- `actions/configure-pages@v3` → `actions/configure-pages@v4`
+- `actions/upload-pages-artifact@v2` → `actions/upload-pages-artifact@v3.0.1`
+- `actions/deploy-pages@v2` → `actions/deploy-pages@v4.0.5`
+- Hugo version: `0.119.0` → `0.134.0`
+
+**Note**: Using specific patch versions (e.g., `@v3.0.1` instead of `@v3`) ensures we get the latest fixes that resolve the deprecated `actions/upload-artifact@v3` dependency.
+
+### 6.2 Additional Improvements
+- Added `fetch-depth: 0` for full git history access
+- Added `--gc` flag for garbage collection during build
+- Updated Taskfile.yaml template to match fixed workflow
+
 ## Status
 
 - ✅ **Taskfile created** with Podman-based Hugo tasks
@@ -231,6 +250,7 @@ task serve
 - ✅ **Podman permissions** - SELinux volume mount issues resolved
 - ✅ **Local testing** - Development server working at localhost:1313
 - ✅ **Production build** - Build process tested and working
+- ✅ **GitHub Actions fix** - Updated to latest non-deprecated actions
 - ⏳ **GitHub setup** - Push to repository and enable Pages
 
 ## Commands Reference
