@@ -1,6 +1,6 @@
 baseURL = 'https://sebastiansuarezbenjumea.github.io/blogs/'
 languageCode = 'en-us'
-title = 'My Blog'
+title = 'Humanly Studios Blog'
 theme = 'PaperMod'
 
 enableRobotsTXT = true
@@ -17,12 +17,12 @@ buildExpired = false
 
 [params]
   env = "production"
-  title = "My Blog"
+  title = "Humanly Studios Blog"
   description = "A blog powered by Hugo and GitHub Pages"
   keywords = ["blog", "hugo", "github-pages"]
   author = "Sebastian Suarez"
   
-  defaultTheme = "auto"
+  defaultTheme = "light"
   disableThemeToggle = false
   
   ShowReadingTime = true
@@ -42,7 +42,7 @@ buildExpired = false
   tocopen = false
 
 [params.homeInfoParams]
-  Title = "Welcome to My Blog"
+  Title = "Humanly Studios Blog"
   Content = "A place for thoughts, ideas, and technical insights."
 
 [[params.socialIcons]]
@@ -78,6 +78,21 @@ buildExpired = false
     guessSyntax = true
     lineNos = true
     style = "github"
+  [markup.goldmark.extensions]
+    definitionList = true
+    footnote = true
+    linkify = true
+    strikethrough = true
+    table = true
+    taskList = true
+    typographer = true
+
+[params.assets]
+  disableHLJS = false
+
+# Enable Mermaid diagrams
+[params.mermaid]
+  enable = true
 
 [outputs]
   home = ["HTML", "RSS", "JSON"]

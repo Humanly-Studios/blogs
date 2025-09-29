@@ -73,7 +73,7 @@ Created the following Hugo directory structure:
 Created `hugo.toml` with:
 - **Base URL**: `https://sebastiansuarezbenjumea.github.io/blogs/`
 - **Language**: English (en-us)
-- **Title**: "My Blog"
+- **Title**: "Humanly Studios Blog"
 - **Features**: Minification, robots.txt, syntax highlighting
 - **Output formats**: HTML, RSS, JSON
 

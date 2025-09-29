@@ -1,0 +1,330 @@
+{{- /* Mermaid support */ -}}
+{{- if .Site.Params.mermaid.enable -}}
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
+<style>
+  /* Enhanced Mermaid diagram styling for maximum visibility */
+  .mermaid {
+    text-align: center;
+    margin: 2rem 0;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    position: relative;
+  }
+  
+  /* Light theme - distinct background with strong border */
+  [data-theme="light"] .mermaid,
+  body:not([data-theme="dark"]) .mermaid {
+    background: #ffffff !important;
+    border: 3px solid #0052cc !important;
+  }
+  
+  /* Dark theme specific enhancements */
+  [data-theme="dark"] .mermaid {
+    border: 2px solid #007acc;
+    background: #1a202c;
+  }
+  
+  /* Force all text to be black in light theme for maximum contrast */
+  [data-theme="light"] .mermaid text,
+  body:not([data-theme="dark"]) .mermaid text {
+    fill: #000000 !important;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+  }
+  
+  /* Ensure node labels have maximum contrast */
+  [data-theme="light"] .mermaid .nodeLabel,
+  [data-theme="light"] .mermaid .label,
+  body:not([data-theme="dark"]) .mermaid .nodeLabel,
+  body:not([data-theme="dark"]) .mermaid .label {
+    color: #000000 !important;
+    fill: #000000 !important;
+    font-weight: 600 !important;
+  }
+  
+  /* Dark theme text */
+  [data-theme="dark"] .mermaid text {
+    fill: #ffffff !important;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    font-size: 14px !important;
+  }
+  
+  /* Force all lines to be black in light theme */
+  [data-theme="light"] .mermaid .edgePath path,
+  [data-theme="light"] .mermaid .flowchart-link,
+  [data-theme="light"] .mermaid .actor-line,
+  [data-theme="light"] .mermaid .messageLine0,
+  [data-theme="light"] .mermaid .messageLine1,
+  [data-theme="light"] .mermaid .loopLine,
+  [data-theme="light"] .mermaid .note-edge,
+  body:not([data-theme="dark"]) .mermaid .edgePath path,
+  body:not([data-theme="dark"]) .mermaid .flowchart-link,
+  body:not([data-theme="dark"]) .mermaid .actor-line,
+  body:not([data-theme="dark"]) .mermaid .messageLine0,
+  body:not([data-theme="dark"]) .mermaid .messageLine1,
+  body:not([data-theme="dark"]) .mermaid .loopLine,
+  body:not([data-theme="dark"]) .mermaid .note-edge {
+    stroke: #000000 !important;
+    stroke-width: 2.5px !important;
+  }
+  
+  /* Force all node borders to be black in light theme */
+  [data-theme="light"] .mermaid .node rect,
+  [data-theme="light"] .mermaid .node circle,
+  [data-theme="light"] .mermaid .node ellipse,
+  [data-theme="light"] .mermaid .node polygon,
+  [data-theme="light"] .mermaid .actor,
+  body:not([data-theme="dark"]) .mermaid .node rect,
+  body:not([data-theme="dark"]) .mermaid .node circle,
+  body:not([data-theme="dark"]) .mermaid .node ellipse,
+  body:not([data-theme="dark"]) .mermaid .node polygon,
+  body:not([data-theme="dark"]) .mermaid .actor {
+    stroke: #000000 !important;
+    stroke-width: 2.5px !important;
+  }
+  
+  /* Enhanced arrowheads */
+  [data-theme="light"] .mermaid .arrowheadPath,
+  [data-theme="light"] .mermaid .arrowMarkerPath,
+  body:not([data-theme="dark"]) .mermaid .arrowheadPath,
+  body:not([data-theme="dark"]) .mermaid .arrowMarkerPath {
+    fill: #000000 !important;
+    stroke: #000000 !important;
+  }
+  
+  /* Enhanced label styling - clean and minimal */
+  [data-theme="light"] .mermaid .edgeLabel,
+  body:not([data-theme="dark"]) .mermaid .edgeLabel {
+    background-color: rgba(255, 255, 255, 0.95) !important;
+    border: 1px solid #cbd5e0 !important;
+    border-radius: 4px !important;
+    padding: 4px 8px !important;
+    color: #1e293b !important;
+    font-size: 11px !important;
+    font-weight: 500 !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+  }
+  
+  /* Hide empty edge labels */
+  [data-theme="light"] .mermaid .edgeLabel:empty,
+  body:not([data-theme="dark"]) .mermaid .edgeLabel:empty {
+    display: none !important;
+  }
+  
+  [data-theme="dark"] .mermaid .edgeLabel {
+    background-color: rgba(26, 32, 44, 0.95) !important;
+    border: 1px solid #007acc !important;
+    border-radius: 4px !important;
+    padding: 2px 6px !important;
+  }
+  
+  /* Hide empty edge labels in dark theme */
+  [data-theme="dark"] .mermaid .edgeLabel:empty {
+    display: none !important;
+  }
+  
+  /* Edge label text styling */
+  [data-theme="light"] .mermaid .edgeLabel span,
+  [data-theme="light"] .mermaid .edgeLabel p,
+  [data-theme="light"] .mermaid .edgeLabel div,
+  body:not([data-theme="dark"]) .mermaid .edgeLabel span,
+  body:not([data-theme="dark"]) .mermaid .edgeLabel p,
+  body:not([data-theme="dark"]) .mermaid .edgeLabel div {
+    color: #1e293b !important;
+    line-height: 1.3 !important;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    display: inline !important;
+  }
+  
+  /* Cluster/subgraph styling */
+  [data-theme="light"] .mermaid .cluster rect,
+  body:not([data-theme="dark"]) .mermaid .cluster rect {
+    stroke: #000000 !important;
+    stroke-width: 2px !important;
+    fill: rgba(227, 242, 253, 0.3) !important;
+  }
+  
+  /* Sequence diagram specific enhancements */
+  [data-theme="light"] .mermaid .messageText,
+  body:not([data-theme="dark"]) .mermaid .messageText {
+    fill: #000000 !important;
+    font-weight: 600 !important;
+  }
+</style>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Mermaid with better theme detection
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark' || 
+                   document.body.classList.contains('dark') ||
+                   window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    mermaid.initialize({
+      startOnLoad: false, // We'll manually render
+      theme: isDark ? 'dark' : 'base',
+      themeVariables: isDark ? {
+        // Dark theme variables
+        primaryColor: '#007acc',
+        primaryTextColor: '#fff',
+        primaryBorderColor: '#007acc',
+        lineColor: '#fff',
+        secondaryColor: '#2d3748',
+        tertiaryColor: '#1a202c',
+        background: '#1a1a1a',
+        mainBkg: '#2d3748',
+        secondBkg: '#1a202c'
+      } : {
+        // Enhanced light theme variables for maximum contrast
+        primaryColor: '#0052cc',
+        primaryTextColor: '#000000',
+        primaryBorderColor: '#0052cc',
+        lineColor: '#000000',
+        secondaryColor: '#d1ecf1',
+        tertiaryColor: '#e8f4f8',
+        background: '#f8f9fa',
+        mainBkg: '#ffffff',
+        secondBkg: '#f1f3f4',
+        
+        // Node colors with strong contrast
+        nodeBkg: '#ffffff',
+        nodeBorder: '#000000',
+        clusterBkg: '#e3f2fd',
+        clusterBorder: '#000000',
+        
+        // Text colors - all black for maximum visibility
+        textColor: '#000000',
+        nodeTextColor: '#000000',
+        taskTextColor: '#000000',
+        labelTextColor: '#000000',
+        activeTaskBkgColor: '#bbdefb',
+        activeTaskBorderColor: '#000000',
+        
+        // Sequence diagram colors with black lines
+        actorBkg: '#ffffff',
+        actorBorder: '#000000',
+        actorTextColor: '#000000',
+        actorLineColor: '#000000',
+        signalColor: '#000000',
+        signalTextColor: '#000000',
+        labelBoxBkgColor: '#ffffff',
+        labelBoxBorderColor: '#000000',
+        labelTextColor: '#000000',
+        loopTextColor: '#000000',
+        
+        // Flowchart colors with black edges
+        edgeLabelBackground: '#ffffff',
+        
+        // Git graph colors - darker variants
+        git0: '#0052cc',
+        git1: '#1b5e20',
+        git2: '#b71c1c',
+        git3: '#e65100',
+        git4: '#4a148c',
+        git5: '#bf360c',
+        git6: '#00695c',
+        git7: '#880e4f',
+        
+        // Class diagram colors
+        classText: '#000000',
+        
+        // Additional edge and line styling
+        edgeColor: '#000000',
+        arrowheadColor: '#000000',
+        
+        // Gantt colors
+        gridColor: '#000000',
+        section0: '#e3f2fd',
+        section1: '#f3e5f5',
+        section2: '#e8f5e8',
+        section3: '#fff3e0',
+        
+        // State diagram colors  
+        labelColor: '#000000',
+        altBackground: '#f5f5f5'
+      }
+    });
+    
+    // Find and render Mermaid diagrams
+    // Hugo renders ```mermaid blocks as language-fallback, so we need to detect by content
+    const allCodeElements = document.querySelectorAll('pre code');
+    const mermaidElements = Array.from(allCodeElements).filter(el => {
+      const text = el.textContent.trim();
+      return text.startsWith('graph ') || 
+             text.startsWith('sequenceDiagram') || 
+             text.startsWith('flowchart ') ||
+             text.startsWith('gitGraph') ||
+             text.startsWith('pie ') ||
+             text.startsWith('journey') ||
+             text.startsWith('gantt') ||
+             text.startsWith('classDiagram') ||
+             text.startsWith('stateDiagram') ||
+             text.startsWith('erDiagram');
+    });
+    
+    console.log('Found Mermaid elements by content detection:', mermaidElements.length);
+    
+    // Debug: log first few code elements to see their structure
+    console.log('All code elements:', allCodeElements.length);
+    allCodeElements.forEach((el, i) => {
+      if (i < 3) { // Only log first 3 to avoid spam
+        console.log(`Code element ${i}:`, {
+          className: el.className,
+          textStart: el.textContent.substring(0, 50),
+          parent: el.parentNode.tagName,
+          parentClass: el.parentNode.className
+        });
+      }
+    });
+    
+    mermaidElements.forEach((element, index) => {
+      const mermaidCode = element.textContent;
+      const mermaidDiv = document.createElement('div');
+      mermaidDiv.className = 'mermaid';
+      mermaidDiv.textContent = mermaidCode;
+      
+      // Find the correct parent to replace (the entire highlight div structure)
+      let parent = element.closest('pre');
+      if (!parent) {
+        parent = element.parentNode;
+      }
+      
+      // For Hugo's highlight structure, we need to go up to the .highlight div
+      const highlightDiv = element.closest('.highlight');
+      if (highlightDiv) {
+        highlightDiv.parentNode.replaceChild(mermaidDiv, highlightDiv);
+      } else {
+        parent.parentNode.replaceChild(mermaidDiv, parent);
+      }
+      
+      console.log(`Replaced Mermaid element ${index} with content: ${mermaidCode.substring(0, 50)}...`);
+    });
+    
+    // Render all mermaid diagrams
+    if (mermaidElements.length > 0) {
+      console.log(`Rendering ${mermaidElements.length} Mermaid diagrams...`);
+      mermaid.run();
+    } else {
+      console.log('No Mermaid diagrams found to render');
+    }
+    
+    // Re-render on theme change
+    const observer = new MutationObserver(function(mutations) {
+      mutations.forEach(function(mutation) {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'data-theme') {
+          location.reload(); // Simple approach: reload page on theme change
+        }
+      });
+    });
+    
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme']
+    });
+    
+    console.log('Mermaid initialized with theme:', isDark ? 'dark' : 'default');
+  });
+</script>
+{{- end -}}
