@@ -13,6 +13,15 @@ This document provides step-by-step instructions for setting up a Hugo blog with
 - Git repository initialized
 - Task (go-task) installed for running tasks
 
+## Adding a new post
+
+```bash
+% task new-post -- "LiteLLm Local Set up"
+What is the post title? [y/N]: y
+task: [new-post] podman run --rm -v /Users/sebastiansuarezbenjumea/work/whatever/blogs:/src:z hugomods/hugo:exts hugo new posts/'litellm-local-set-up'.md
+```
+
+
 ## Step 1: Taskfile Creation ✅
 
 Created `Taskfile.yaml` with comprehensive Hugo tasks using Podman containers:

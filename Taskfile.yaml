@@ -50,9 +50,18 @@ tasks:
     desc: Create a new blog post
     prompt: What is the post title?
     vars:
-      POST_TITLE: '{{.CLI_ARGS | default .ANSWER}}'
-      POST_SLUG: '{{.POST_TITLE | lower | replace " " "-"}}'
+      POST_TITLE: "{{if .CLI_ARGS}}{{.CLI_ARGS}}{{else}}{{.ANSWER}}{{end}}"
+      POST_SLUG: "{{.POST_TITLE | lower | replace \" \" \"-\" | replace \"'\" \"\" | replace \"\\\"\" \"\" | trim}}"
     cmds:
+      - |
+        if [ -z "{{.POST_TITLE}}" ]; then
+          echo "Error: Post title cannot be empty"
+          exit 1
+        fi
+        if [ "{{.POST_SLUG}}" = "" ]; then
+          echo "Error: Generated slug cannot be empty"
+          exit 1
+        fi
       - podman run --rm -v {{.SITE_DIR}}:/src:z {{.HUGO_IMAGE}}:{{.HUGO_TAG}} hugo new posts/{{.POST_SLUG}}.md
 
   new-page:
