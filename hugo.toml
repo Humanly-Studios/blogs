@@ -1,6 +1,6 @@
 baseURL = 'https://sebastiansuarezbenjumea.github.io/blogs/'
 languageCode = 'en-us'
-title = 'My Blog'
+title = 'Humanly Studios Blog'
 theme = 'PaperMod'
 
 enableRobotsTXT = true
@@ -17,12 +17,12 @@ buildExpired = false
 
 [params]
   env = "production"
-  title = "My Blog"
+  title = "Humanly Studios Blog"
   description = "A blog powered by Hugo and GitHub Pages"
   keywords = ["blog", "hugo", "github-pages"]
   author = "Sebastian Suarez"
   
-  defaultTheme = "auto"
+  defaultTheme = "light"
   disableThemeToggle = false
   
   ShowReadingTime = true
