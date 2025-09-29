@@ -1,0 +1,245 @@
+version: '3'
+
+vars:
+  HUGO_IMAGE: hugomods/hugo
+  HUGO_TAG: exts
+  CONTAINER_NAME: hugo-blog
+  SITE_DIR: "{{.PWD}}"
+  PUBLIC_DIR: public
+  CONTENT_DIR: content
+  THEMES_DIR: themes
+
+tasks:
+  init:
+    desc: Initialize a new Hugo site
+    cmds:
+      - podman run --rm -v {{.SITE_DIR}}:/src:z {{.HUGO_IMAGE}}:{{.HUGO_TAG}} hugo new site . --force
+      - task: gitignore
+    status:
+      - test -f hugo.toml || test -f config.toml || test -f config.yaml
+
+  serve:
+    desc: Start Hugo development server
+    cmds:
+      - podman run --rm -it -v {{.SITE_DIR}}:/src:z -p 1313:1313 {{.HUGO_IMAGE}}:{{.HUGO_TAG}} hugo server --bind 0.0.0.0 --buildDrafts --buildFuture
+
+  serve-prod:
+    desc: Start Hugo development server in production mode
+    cmds:
+      - podman run --rm -it -v {{.SITE_DIR}}:/src:z -p 1313:1313 {{.HUGO_IMAGE}}:{{.HUGO_TAG}} hugo server --bind 0.0.0.0 --environment production
+
+  build:
+    desc: Build the Hugo site for production
+    cmds:
+      - podman run --rm -v {{.SITE_DIR}}:/src:z {{.HUGO_IMAGE}}:{{.HUGO_TAG}} hugo --minify --environment production
+    generates:
+      - "{{.PUBLIC_DIR}}/**/*"
+
+  build-dev:
+    desc: Build the Hugo site for development (includes drafts)
+    cmds:
+      - podman run --rm -v {{.SITE_DIR}}:/src:z {{.HUGO_IMAGE}}:{{.HUGO_TAG}} hugo --buildDrafts --buildFuture
+
+  clean:
+    desc: Clean build artifacts
+    cmds:
+      - rm -rf {{.PUBLIC_DIR}}
+      - rm -f .hugo_build.lock
+
+  new-post:
+    desc: Create a new blog post
+    prompt: What is the post title?
+    vars:
+      POST_TITLE: '{{.CLI_ARGS | default .ANSWER}}'
+      POST_SLUG: '{{.POST_TITLE | lower | replace " " "-"}}'
+    cmds:
+      - podman run --rm -v {{.SITE_DIR}}:/src:z {{.HUGO_IMAGE}}:{{.HUGO_TAG}} hugo new posts/{{.POST_SLUG}}.md
+
+  new-page:
+    desc: Create a new page
+    prompt: What is the page name?
+    vars:
+      PAGE_NAME: '{{.CLI_ARGS | default .ANSWER}}'
+    cmds:
+      - podman run --rm -v {{.SITE_DIR}}:/src:z {{.HUGO_IMAGE}}:{{.HUGO_TAG}} hugo new {{.PAGE_NAME}}.md
+
+  theme-add:
+    desc: Add a theme as a git submodule
+    prompt: What is the theme repository URL?
+    vars:
+      THEME_URL: '{{.CLI_ARGS | default .ANSWER}}'
+      THEME_NAME: '{{.THEME_URL | base | replace ".git" ""}}'
+    cmds:
+      - git submodule add {{.THEME_URL}} themes/{{.THEME_NAME}}
+      - git submodule update --init --recursive
+
+  theme-update:
+    desc: Update all theme submodules
+    cmds:
+      - git submodule update --remote --merge
+
+  hugo-version:
+    desc: Show Hugo version
+    cmds:
+      - podman run --rm {{.HUGO_IMAGE}}:{{.HUGO_TAG}} hugo version
+
+  hugo-check:
+    desc: Check Hugo configuration and content
+    cmds:
+      - podman run --rm -v {{.SITE_DIR}}:/src:z {{.HUGO_IMAGE}}:{{.HUGO_TAG}} hugo check
+
+  hugo-mod-init:
+    desc: Initialize Hugo modules
+    prompt: What is the module name (e.g., github.com/user/repo)?
+    vars:
+      MODULE_NAME: '{{.CLI_ARGS | default .ANSWER}}'
+    cmds:
+      - podman run --rm -v {{.SITE_DIR}}:/src:z {{.HUGO_IMAGE}}:{{.HUGO_TAG}} hugo mod init {{.MODULE_NAME}}
+
+  hugo-mod-get:
+    desc: Add a Hugo module theme
+    prompt: What is the theme module (e.g., github.com/adityatelange/hugo-PaperMod/v7)?
+    vars:
+      THEME_MODULE: '{{.CLI_ARGS | default .ANSWER}}'
+    cmds:
+      - podman run --rm -v {{.SITE_DIR}}:/src:z {{.HUGO_IMAGE}}:{{.HUGO_TAG}} hugo mod get {{.THEME_MODULE}}
+
+  hugo-mod-tidy:
+    desc: Clean up Hugo modules
+    cmds:
+      - podman run --rm -v {{.SITE_DIR}}:/src:z {{.HUGO_IMAGE}}:{{.HUGO_TAG}} hugo mod tidy
+
+  gitignore:
+    desc: Create .gitignore for Hugo
+    cmds:
+      - |
+        cat > .gitignore << 'EOF'
+        # Hugo build artifacts
+        /public/
+        /resources/_gen/
+        /assets/jsconfig.json
+        hugo_stats.json
+        .hugo_build.lock
+
+        # OS generated files
+        .DS_Store
+        .DS_Store?
+        ._*
+        .Spotlight-V100
+        .Trashes
+        ehthumbs.db
+        Thumbs.db
+
+        # IDE files
+        .vscode/
+        .idea/
+        *.swp
+        *.swo
+        *~
+
+        # Logs
+        *.log
+
+        # Runtime data
+        pids
+        *.pid
+        *.seed
+
+        # Dependency directories
+        node_modules/
+
+        # Optional npm cache directory
+        .npm
+
+        # Optional REPL history
+        .node_repl_history
+        EOF
+    status:
+      - test -f .gitignore
+
+  setup:
+    desc: Complete setup for new Hugo site with GitHub Pages
+    cmds:
+      - task: init
+      - task: gitignore
+      - task: github-workflow
+      - echo "Setup complete! Run 'task serve' to start development server"
+
+  github-workflow:
+    desc: Create GitHub Actions workflow for deployment
+    cmds:
+      - mkdir -p .github/workflows
+      - |
+        cat > .github/workflows/hugo.yml << 'EOF'
+        name: Deploy Hugo site to Pages
+
+        on:
+          push:
+            branches: ["main"]
+          workflow_dispatch:
+
+        permissions:
+          contents: read
+          pages: write
+          id-token: write
+
+        concurrency:
+          group: "pages"
+          cancel-in-progress: false
+
+        defaults:
+          run:
+            shell: bash
+
+        jobs:
+          build:
+            runs-on: ubuntu-latest
+            env:
+              HUGO_VERSION: 0.119.0
+            steps:
+              - name: Install Hugo CLI
+                run: |
+                  wget -O ${{ runner.temp }}/hugo.deb https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_linux-amd64.deb \
+                  && sudo dpkg -i ${{ runner.temp }}/hugo.deb
+              - name: Install Dart Sass
+                run: sudo snap install dart-sass
+              - name: Checkout
+                uses: actions/checkout@v4
+                with:
+                  submodules: recursive
+              - name: Setup Pages
+                id: pages
+                uses: actions/configure-pages@v3
+              - name: Install Node.js dependencies
+                run: "[[ -f package-lock.json || -f npm-shrinkwrap.json ]] && npm ci || true"
+              - name: Build with Hugo
+                env:
+                  HUGO_ENVIRONMENT: production
+                  HUGO_ENV: production
+                run: |
+                  hugo \
+                    --minify \
+                    --baseURL "${{ steps.pages.outputs.base_url }}/"
+              - name: Upload artifact
+                uses: actions/upload-pages-artifact@v2
+                with:
+                  path: ./public
+
+          deploy:
+            environment:
+              name: github-pages
+              url: ${{ steps.deployment.outputs.page_url }}
+            runs-on: ubuntu-latest
+            needs: build
+            steps:
+              - name: Deploy to GitHub Pages
+                id: deployment
+                uses: actions/deploy-pages@v2
+        EOF
+    status:
+      - test -f .github/workflows/hugo.yml
+
+  help:
+    desc: Show available tasks
+    cmds:
+      - task --list
