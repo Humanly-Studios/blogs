@@ -1,0 +1,104 @@
+{{- /* Mermaid support */ -}}
+{{- if .Site.Params.mermaid.enable -}}
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Mermaid with better theme detection
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark' || 
+                   document.body.classList.contains('dark') ||
+                   window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    mermaid.initialize({
+      startOnLoad: false, // We'll manually render
+      theme: isDark ? 'dark' : 'default',
+      themeVariables: {
+        primaryColor: '#007acc',
+        primaryTextColor: isDark ? '#fff' : '#333',
+        primaryBorderColor: '#007acc',
+        lineColor: isDark ? '#fff' : '#333',
+        secondaryColor: isDark ? '#2d3748' : '#f8f9fa',
+        tertiaryColor: isDark ? '#1a202c' : '#fff'
+      }
+    });
+    
+    // Find and render Mermaid diagrams
+    // Hugo renders ```mermaid blocks as language-fallback, so we need to detect by content
+    const allCodeElements = document.querySelectorAll('pre code');
+    const mermaidElements = Array.from(allCodeElements).filter(el => {
+      const text = el.textContent.trim();
+      return text.startsWith('graph ') || 
+             text.startsWith('sequenceDiagram') || 
+             text.startsWith('flowchart ') ||
+             text.startsWith('gitGraph') ||
+             text.startsWith('pie ') ||
+             text.startsWith('journey') ||
+             text.startsWith('gantt') ||
+             text.startsWith('classDiagram') ||
+             text.startsWith('stateDiagram') ||
+             text.startsWith('erDiagram');
+    });
+    
+    console.log('Found Mermaid elements by content detection:', mermaidElements.length);
+    
+    // Debug: log first few code elements to see their structure
+    console.log('All code elements:', allCodeElements.length);
+    allCodeElements.forEach((el, i) => {
+      if (i < 3) { // Only log first 3 to avoid spam
+        console.log(`Code element ${i}:`, {
+          className: el.className,
+          textStart: el.textContent.substring(0, 50),
+          parent: el.parentNode.tagName,
+          parentClass: el.parentNode.className
+        });
+      }
+    });
+    
+    mermaidElements.forEach((element, index) => {
+      const mermaidCode = element.textContent;
+      const mermaidDiv = document.createElement('div');
+      mermaidDiv.className = 'mermaid';
+      mermaidDiv.textContent = mermaidCode;
+      
+      // Find the correct parent to replace (the entire highlight div structure)
+      let parent = element.closest('pre');
+      if (!parent) {
+        parent = element.parentNode;
+      }
+      
+      // For Hugo's highlight structure, we need to go up to the .highlight div
+      const highlightDiv = element.closest('.highlight');
+      if (highlightDiv) {
+        highlightDiv.parentNode.replaceChild(mermaidDiv, highlightDiv);
+      } else {
+        parent.parentNode.replaceChild(mermaidDiv, parent);
+      }
+      
+      console.log(`Replaced Mermaid element ${index} with content: ${mermaidCode.substring(0, 50)}...`);
+    });
+    
+    // Render all mermaid diagrams
+    if (mermaidElements.length > 0) {
+      console.log(`Rendering ${mermaidElements.length} Mermaid diagrams...`);
+      mermaid.run();
+    } else {
+      console.log('No Mermaid diagrams found to render');
+    }
+    
+    // Re-render on theme change
+    const observer = new MutationObserver(function(mutations) {
+      mutations.forEach(function(mutation) {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'data-theme') {
+          location.reload(); // Simple approach: reload page on theme change
+        }
+      });
+    });
+    
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme']
+    });
+    
+    console.log('Mermaid initialized with theme:', isDark ? 'dark' : 'default');
+  });
+</script>
+{{- end -}}

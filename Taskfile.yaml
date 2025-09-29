@@ -18,13 +18,27 @@ tasks:
     status:
       - test -f hugo.toml || test -f config.toml || test -f config.yaml
 
+  stop-hugo:
+    desc: Stop any running Hugo containers
+    cmds:
+      - |
+        # Stop all containers using the Hugo image or port 1313
+        podman ps -q --filter "ancestor={{.HUGO_IMAGE}}:{{.HUGO_TAG}}" | xargs -r podman stop
+        # Also stop any containers using port 1313
+        podman ps -q --filter "publish=1313" | xargs -r podman stop
+        # Clean up any stopped containers
+        podman container prune -f
+    silent: true
+
   serve:
     desc: Start Hugo development server
+    deps: [stop-hugo]
     cmds:
       - podman run --rm -it -v {{.SITE_DIR}}:/src:z -p 1313:1313 {{.HUGO_IMAGE}}:{{.HUGO_TAG}} hugo server --bind 0.0.0.0 --buildDrafts --buildFuture
 
   serve-prod:
     desc: Start Hugo development server in production mode
+    deps: [stop-hugo]
     cmds:
       - podman run --rm -it -v {{.SITE_DIR}}:/src:z -p 1313:1313 {{.HUGO_IMAGE}}:{{.HUGO_TAG}} hugo server --bind 0.0.0.0 --environment production
 
