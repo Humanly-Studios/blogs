@@ -9,7 +9,7 @@ tasks:
       - mkdir -p config
       - echo "Starting LiteLLM with config file..."
       - cat config/config.yaml
-      - docker run -d --name litellm-proxy -p 4000:4000 -v $(pwd)/config:/app/config --env PORT=4000 --env LITELLM_MASTER_KEY=sk-cascade-master-key --env HUGGINGFACE_API_KEY=${HUGGINGFACE_API_KEY} ghcr.io/berriai/litellm:main-stable --config /app/config/config.yaml --port 4000 --num_workers 1
+      - docker run -d --name litellm-proxy -p ${LITELLM_PORT:-4000}:4000 -v $(pwd)/config:/app/config --env PORT=${LITELLM_PORT:-4000} --env LITELLM_MASTER_KEY=sk-cascade-master-key --env HUGGINGFACE_API_KEY=${HUGGINGFACE_API_KEY} ghcr.io/berriai/litellm:main-stable --config /app/config/config.yaml --port ${LITELLM_PORT:-4000} --num_workers 1
     status:
       - docker ps | grep litellm-proxy
 
@@ -33,14 +33,14 @@ tasks:
   test-litellm:
     desc: Test if LiteLLM is running and accessible
     cmds:
-      - curl -s http://localhost:4000/health
+      - curl -s http://localhost:${LITELLM_PORT:-4000}/health
 
   test-qwen:
     desc: Test the Qwen2.5-Coder model
     cmds:
       - echo "Testing Qwen2.5-Coder model..."
       - |
-        curl -X POST http://localhost:4000/chat/completions \
+        curl -X POST http://localhost:${LITELLM_PORT:-4000}/chat/completions \
           -H "Content-Type: application/json" \
           -H "Authorization: Bearer sk-cascade-master-key" \
           -d '{"model": "qwen2.5-coder-14b", "messages": [{"role": "user", "content": "Write a simple Python function to calculate fibonacci numbers"}], "max_tokens": 200}'
@@ -58,7 +58,7 @@ tasks:
   setup-env:
     desc: Set up environment variables for cascade-code
     cmds:
-      - echo "LITELLM_PROXY_URL=http://localhost:4000" > .env
+      - echo "LITELLM_PROXY_URL=http://localhost:${LITELLM_PORT:-4000}" > .env
       - echo "LITELLM_API_KEY=sk-cascade-master-key" >> .env
 
   setup-env-template:
@@ -70,9 +70,9 @@ tasks:
   info:
     desc: Display information about the LiteLLM setup
     cmds:
-      - echo "LiteLLM Proxy is running on http://localhost:4000"
+      - echo "LiteLLM Proxy is running on http://localhost:${LITELLM_PORT:-4000}"
       - echo "Configuration file is located at config/config.yaml"
-      - echo "To use with cascade-code, set LITELLM_PROXY_URL=http://localhost:4000"
+      - echo "To use with cascade-code, set LITELLM_PROXY_URL=http://localhost:${LITELLM_PORT:-4000}"
       - echo "Run 'task setup-env' to create the .env file for cascade-code integration"
 
   install-aider:
@@ -111,7 +111,7 @@ tasks:
       - echo ""
       - |
         # Check if LiteLLM is running
-        if ! curl -s http://localhost:4000/health > /dev/null; then
+        if ! curl -s http://localhost:${LITELLM_PORT:-4000}/health > /dev/null; then
           echo "❌ LiteLLM proxy not running. Starting it..."
           task run-litellm
           sleep 5
@@ -132,7 +132,7 @@ tasks:
         
         echo "" >> "$SHELL_PROFILE"
         echo "# Aider + LiteLLM Configuration (qwen2.5-coder-14b)" >> "$SHELL_PROFILE"
-        echo "export LITELLM_API_BASE=http://localhost:4000" >> "$SHELL_PROFILE"
+        echo "export LITELLM_API_BASE=http://localhost:${LITELLM_PORT:-4000}" >> "$SHELL_PROFILE"
         echo "export LITELLM_API_KEY=sk-cascade-master-key" >> "$SHELL_PROFILE"
         echo "export AIDER_MODEL=qwen2.5-coder-14b" >> "$SHELL_PROFILE"
         echo "" >> "$SHELL_PROFILE"
@@ -140,7 +140,7 @@ tasks:
         echo "Added Aider configuration to $SHELL_PROFILE"
       - echo "Setting environment variables for current session..."
       - |
-        export LITELLM_API_BASE=http://localhost:4000
+        export LITELLM_API_BASE=http://localhost:${LITELLM_PORT:-4000}
         export LITELLM_API_KEY=sk-cascade-master-key
         export AIDER_MODEL=qwen2.5-coder-14b
         
@@ -157,7 +157,7 @@ tasks:
       - |
         echo "2. Navigate to your project: cd your-project"
       - |
-        echo "3. Start Aider: aider --model qwen2.5-coder-14b --api-base http://localhost:4000 --api-key sk-cascade-master-key"
+        echo "3. Start Aider: aider --model qwen2.5-coder-14b --api-base http://localhost:${LITELLM_PORT:-4000} --api-key sk-cascade-master-key"
       - |
         echo "   Or simply: aider (uses environment variables)"
       - echo ""
@@ -183,7 +183,7 @@ tasks:
         fi
       - |
         # Check if LiteLLM is running
-        if ! curl -s http://localhost:4000/health > /dev/null; then
+        if ! curl -s http://localhost:${LITELLM_PORT:-4000}/health > /dev/null; then
           echo "❌ LiteLLM proxy not running. Starting it..."
           task run-litellm
           sleep 5
@@ -193,7 +193,7 @@ tasks:
       - echo ""
       - echo "Testing LiteLLM API with qwen2.5-coder-14b model..."
       - |
-        curl -X POST http://localhost:4000/chat/completions \
+        curl -X POST http://localhost:${LITELLM_PORT:-4000}/chat/completions \
           -H "Content-Type: application/json" \
           -H "Authorization: Bearer sk-cascade-master-key" \
           -d '{
@@ -220,13 +220,13 @@ tasks:
       - echo "🚀 Starting Aider with qwen2.5-coder-14b model..."
       - |
         # Check if LiteLLM is running
-        if ! curl -s http://localhost:4000/health > /dev/null; then
+        if ! curl -s http://localhost:${LITELLM_PORT:-4000}/health > /dev/null; then
           echo "❌ LiteLLM proxy not running. Starting it..."
           task run-litellm
           sleep 5
         fi
       - echo "Starting Aider..."
-      - aider --model qwen2.5-coder-14b --api-base http://localhost:4000 --api-key sk-cascade-master-key
+      - aider --model qwen2.5-coder-14b --api-base http://localhost:${LITELLM_PORT:-4000} --api-key sk-cascade-master-key
 
   test-litellm-api:
     desc: Test LiteLLM proxy API directly for coding assistance
@@ -234,7 +234,7 @@ tasks:
       - echo "Testing LiteLLM proxy API for coding tasks..."
       - echo "Checking if LiteLLM proxy is running..."
       - |
-        if ! curl -s http://localhost:4000/health > /dev/null; then
+        if ! curl -s http://localhost:${LITELLM_PORT:-4000}/health > /dev/null; then
           echo "❌ LiteLLM proxy not running. Starting it..."
           task run-litellm
           sleep 5
@@ -244,7 +244,7 @@ tasks:
       - echo ""
       - echo "Testing qwen2.5-coder-14b model for coding tasks..."
       - |
-        curl -X POST http://localhost:4000/chat/completions \
+        curl -X POST http://localhost:${LITELLM_PORT:-4000}/chat/completions \
           -H "Content-Type: application/json" \
           -H "Authorization: Bearer sk-cascade-master-key" \
           -d '{
@@ -257,6 +257,6 @@ tasks:
       - echo ""
       - echo "💡 Usage examples:"
       - |
-        echo "1. Direct API calls: curl -X POST http://localhost:4000/chat/completions ..."
+        echo "1. Direct API calls: curl -X POST http://localhost:${LITELLM_PORT:-4000}/chat/completions ..."
       - echo "2. Use with any OpenAI-compatible client"
       - echo "3. Integrate with VS Code extensions that support OpenAI API"

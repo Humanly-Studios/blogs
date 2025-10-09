@@ -1,0 +1,12 @@
+model_list:
+  - model_name: qwen2.5-coder-14b
+    litellm_params:
+      model: huggingface/qwen2.5-coder-14b
+      api_base: https://gymggaklrnsfxmkk.us-east-1.aws.endpoints.huggingface.cloud
+      api_key: os.environ/HUGGINGFACE_API_KEY
+      custom_llm_provider: huggingface
+
+general_settings:
+  master_key: sk-cascade-master-key
+  drop_params: true
+  set_verbose: true
