@@ -13,13 +13,28 @@ This document provides step-by-step instructions for setting up a Hugo blog with
 - Git repository initialized
 - Task (go-task) installed for running tasks
 
-## Adding a new post
+## Multilanguage Support ✅
+
+This blog now supports **English** and **Spanish** with automatic language switching.
+
+See [MULTILANGUAGE.md](./MULTILANGUAGE.md) for complete documentation.
+
+### Quick Reference
 
 ```bash
-% task new-post -- "LiteLLm Local Set up"
-What is the post title? [y/N]: y
-task: [new-post] podman run --rm -v /Users/sebastiansuarezbenjumea/work/whatever/blogs:/src:z hugomods/hugo:exts hugo new posts/'litellm-local-set-up'.md
+# Create English post (default)
+task new-post -- "My Post Title"
+
+# Create Spanish post
+task new-post-es -- "Mi Título de Artículo"
+
+# Create both languages at once
+task new-post-both -- "Post Title"
 ```
+
+**URLs:**
+- English: `https://sebastiansuarezbenjumea.github.io/blogs/`
+- Spanish: `https://sebastiansuarezbenjumea.github.io/blogs/es/`
 
 
 ## Step 1: Taskfile Creation ✅
@@ -40,8 +55,10 @@ task serve           # Start development server (with drafts)
 task build           # Build for production
 task clean           # Clean build artifacts
 
-# Content creation
-task new-post        # Create new blog post
+# Content creation (multilanguage)
+task new-post        # Create English blog post
+task new-post-es     # Create Spanish blog post
+task new-post-both   # Create post in both languages
 task new-page        # Create new page
 
 # Theme management
@@ -260,6 +277,7 @@ task serve
 - ✅ **Local testing** - Development server working at localhost:1313
 - ✅ **Production build** - Build process tested and working
 - ✅ **GitHub Actions fix** - Updated to latest non-deprecated actions
+- ✅ **Multilanguage support** - English and Spanish with automatic language switching
 - ⏳ **GitHub setup** - Push to repository and enable Pages
 
 ## Commands Reference

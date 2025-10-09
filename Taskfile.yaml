@@ -61,7 +61,7 @@ tasks:
       - rm -f .hugo_build.lock
 
   new-post:
-    desc: Create a new blog post
+    desc: Create a new blog post (English by default, use new-post-es for Spanish)
     prompt: What is the post title?
     vars:
       POST_TITLE: "{{if .CLI_ARGS}}{{.CLI_ARGS}}{{else}}{{.ANSWER}}{{end}}"
@@ -76,7 +76,49 @@ tasks:
           echo "Error: Generated slug cannot be empty"
           exit 1
         fi
-      - podman run --rm -v {{.SITE_DIR}}:/src:z {{.HUGO_IMAGE}}:{{.HUGO_TAG}} hugo new posts/{{.POST_SLUG}}.md
+      - podman run --rm -v {{.SITE_DIR}}:/src:z {{.HUGO_IMAGE}}:{{.HUGO_TAG}} hugo new en/posts/{{.POST_SLUG}}.md
+      - echo "✅ Created English post at content/en/posts/{{.POST_SLUG}}.md"
+  
+  new-post-es:
+    desc: Create a new blog post in Spanish
+    prompt: What is the post title? (¿Cuál es el título del artículo?)
+    vars:
+      POST_TITLE: "{{if .CLI_ARGS}}{{.CLI_ARGS}}{{else}}{{.ANSWER}}{{end}}"
+      POST_SLUG: "{{.POST_TITLE | lower | replace \" \" \"-\" | replace \"'\" \"\" | replace \"\\\"\" \"\" | trim}}"
+    cmds:
+      - |
+        if [ -z "{{.POST_TITLE}}" ]; then
+          echo "Error: Post title cannot be empty"
+          exit 1
+        fi
+        if [ "{{.POST_SLUG}}" = "" ]; then
+          echo "Error: Generated slug cannot be empty"
+          exit 1
+        fi
+      - podman run --rm -v {{.SITE_DIR}}:/src:z {{.HUGO_IMAGE}}:{{.HUGO_TAG}} hugo new es/posts/{{.POST_SLUG}}.md
+      - echo "✅ Artículo en español creado en content/es/posts/{{.POST_SLUG}}.md"
+  
+  new-post-both:
+    desc: Create a new blog post in both English and Spanish
+    prompt: What is the post title?
+    vars:
+      POST_TITLE: "{{if .CLI_ARGS}}{{.CLI_ARGS}}{{else}}{{.ANSWER}}{{end}}"
+      POST_SLUG: "{{.POST_TITLE | lower | replace \" \" \"-\" | replace \"'\" \"\" | replace \"\\\"\" \"\" | trim}}"
+    cmds:
+      - |
+        if [ -z "{{.POST_TITLE}}" ]; then
+          echo "Error: Post title cannot be empty"
+          exit 1
+        fi
+        if [ "{{.POST_SLUG}}" = "" ]; then
+          echo "Error: Generated slug cannot be empty"
+          exit 1
+        fi
+      - podman run --rm -v {{.SITE_DIR}}:/src:z {{.HUGO_IMAGE}}:{{.HUGO_TAG}} hugo new en/posts/{{.POST_SLUG}}.md
+      - podman run --rm -v {{.SITE_DIR}}:/src:z {{.HUGO_IMAGE}}:{{.HUGO_TAG}} hugo new es/posts/{{.POST_SLUG}}.md
+      - echo "✅ Created posts in both languages:"
+      - echo "   - content/en/posts/{{.POST_SLUG}}.md"
+      - echo "   - content/es/posts/{{.POST_SLUG}}.md"
 
   new-page:
     desc: Create a new page

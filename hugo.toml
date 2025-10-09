@@ -1,12 +1,42 @@
 baseURL = 'https://sebastiansuarezbenjumea.github.io/blogs/'
-languageCode = 'en-us'
-title = 'Humanly Studios Blog'
+defaultContentLanguage = 'en'
+defaultContentLanguageInSubdir = false
 theme = 'PaperMod'
 
 enableRobotsTXT = true
 buildDrafts = false
 buildFuture = false
 buildExpired = false
+
+# Multilanguage configuration
+[languages]
+  [languages.en]
+    languageCode = 'en-us'
+    languageName = 'English'
+    title = 'Humanly Studios Blog'
+    weight = 1
+    contentDir = 'content/en'
+    
+    [languages.en.params]
+      description = "A blog powered by Hugo and GitHub Pages"
+      
+    [languages.en.params.homeInfoParams]
+      Title = "Humanly Studios Blog"
+      Content = "A place for thoughts, ideas, and technical insights."
+  
+  [languages.es]
+    languageCode = 'es'
+    languageName = 'Español'
+    title = 'Blog de Humanly Studios'
+    weight = 2
+    contentDir = 'content/es'
+    
+    [languages.es.params]
+      description = "Un blog impulsado por Hugo y GitHub Pages"
+      
+    [languages.es.params.homeInfoParams]
+      Title = "Blog de Humanly Studios"
+      Content = "Un lugar para pensamientos, ideas y conocimientos técnicos."
 
 [pagination]
   pagerSize = 10
@@ -49,23 +79,44 @@ buildExpired = false
   name = "github"
   url = "https://github.com/sebastiansuarezbenjumea"
 
-[menu]
-  [[menu.main]]
+# English menu
+[languages.en.menu]
+  [[languages.en.menu.main]]
     identifier = "home"
     name = "Home"
-    url = "/"
+    url = "/en/"
     weight = 10
     
-  [[menu.main]]
+  [[languages.en.menu.main]]
     identifier = "posts"
     name = "Posts"
-    url = "/posts/"
+    url = "/en/posts/"
     weight = 20
     
-  [[menu.main]]
+  [[languages.en.menu.main]]
     identifier = "about"
     name = "About"
-    url = "/about/"
+    url = "/en/about/"
+    weight = 30
+
+# Spanish menu
+[languages.es.menu]
+  [[languages.es.menu.main]]
+    identifier = "home"
+    name = "Inicio"
+    url = "/es/"
+    weight = 10
+    
+  [[languages.es.menu.main]]
+    identifier = "posts"
+    name = "Artículos"
+    url = "/es/posts/"
+    weight = 20
+    
+  [[languages.es.menu.main]]
+    identifier = "about"
+    name = "Acerca de"
+    url = "/es/about/"
     weight = 30
 
 [markup]
