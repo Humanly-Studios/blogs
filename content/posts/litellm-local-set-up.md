@@ -62,7 +62,7 @@ The setup uses a Taskfile.yaml that automates:
 ### Prerequisites
 - Podman installed
 - Hugging Face API key
-- Task runner (go-task.github.io)
+- [Task runner](https://taskfile.dev/) ([go-task.github.io](https://github.com/go-task/task))
 
 ### Basic Usage
 
