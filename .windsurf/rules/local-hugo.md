@@ -132,3 +132,197 @@ task build
 ---
 
 **Remember**: Always use `task` commands, never direct `hugo` commands. The containerized approach ensures consistent builds across environments.
+## PaperMod Theme Multilingual Customizations
+
+### Critical Multilingual Configuration
+
+**IMPORTANT: This project uses custom PaperMod theme modifications for multilingual support. DO NOT modify these files without understanding the complete setup.**
+
+#### Hugo Configuration Requirements
+
+**File**: `hugo.toml`
+```toml
+# CRITICAL: These settings are required for multilingual functionality
+baseURL = 'https://humanly-studios.github.io/blogs/'
+defaultContentLanguage = 'en'
+defaultContentLanguageInSubdir = true  # ← ESSENTIAL for proper URL structure
+theme = 'PaperMod'
+
+# Language configuration - NO individual baseURL needed
+[languages]
+  [languages.en]
+    languageCode = 'en-us'
+    languageName = 'English'
+    title = 'Humanly Studios Blog'
+    weight = 1
+    contentDir = 'content/en'
+    # DO NOT add baseURL here
+    
+  [languages.es]
+    languageCode = 'es'
+    languageName = 'Español'
+    title = 'Blog de Humanly Studios'
+    weight = 2
+    contentDir = 'content/es'
+    # DO NOT add baseURL here
+
+# Menu configuration - MUST use relative paths
+[languages.en.menu]
+  [[languages.en.menu.main]]
+    identifier = "home"
+    name = "Home"
+    url = "/"           # ← Root path for home
+    weight = 10
+  [[languages.en.menu.main]]
+    identifier = "posts"
+    name = "Posts"
+    url = "posts/"      # ← Relative path (no leading slash)
+    weight = 20
+  [[languages.en.menu.main]]
+    identifier = "about"
+    name = "About"
+    url = "about/"      # ← Relative path (no leading slash)
+    weight = 30
+
+[languages.es.menu]
+  [[languages.es.menu.main]]
+    identifier = "home"
+    name = "Inicio"
+    url = "/"           # ← Root path for home
+    weight = 10
+  [[languages.es.menu.main]]
+    identifier = "posts"
+    name = "Artículos"
+    url = "posts/"      # ← Relative path (no leading slash)
+    weight = 20
+  [[languages.es.menu.main]]
+    identifier = "about"
+    name = "Acerca de"
+    url = "about/"      # ← Relative path (no leading slash)
+    weight = 30
+```
+
+#### Custom Layout Files
+
+**CRITICAL FILES - DO NOT DELETE OR MODIFY WITHOUT UNDERSTANDING:**
+
+##### 1. `layouts/partials/extend_head.html`
+- **Purpose**: Contains JavaScript fix for menu URL issues
+- **Function**: Automatically corrects wrong menu URLs after page load
+- **Key Features**:
+  - Detects and fixes Spanish "Inicio" links from `/es/blogs/` to `/blogs/es/`
+  - Detects and fixes English "Home" links from `/en/blogs/` to `/blogs/en/`
+  - Provides URL redirect for users who reach wrong URLs
+  - Console logging for debugging
+
+##### 2. `layouts/partials/header.html`
+- **Purpose**: Custom header with hardcoded correct menu URLs
+- **Function**: Overrides theme's default menu generation
+- **Key Features**:
+  - Language-specific menu structure
+  - Hardcoded correct URLs that bypass Hugo's URL transformation
+  - Fallback solution when JavaScript fails
+
+#### Content Structure Requirements
+
+**File Structure**:
+```
+content/
+├── en/
+│   ├── _index.md          # MUST have aliases: ["en/blogs/"]
+│   ├── about.md
+│   └── posts/
+│       └── *.md
+└── es/
+    ├── _index.md          # MUST have aliases: ["es/blogs/"]
+    ├── about.md
+    └── posts/
+        └── *.md
+```
+
+**Required Aliases in Index Files**:
+
+`content/en/_index.md`:
+```yaml
+---
+title: "Humanly Studios Blog"
+aliases:
+  - "en/blogs/"           # ← CRITICAL: Provides fallback URL access
+---
+```
+
+`content/es/_index.md`:
+```yaml
+---
+title: "Blog de Humanly Studios"
+aliases:
+  - "es/blogs/"           # ← CRITICAL: Provides fallback URL access
+---
+```
+
+### URL Structure
+
+**Correct URLs (WORKING)**:
+- English Home: `http://localhost:1313/blogs/en/`
+- English Posts: `http://localhost:1313/blogs/en/posts/`
+- Spanish Home: `http://localhost:1313/blogs/es/`
+- Spanish Posts: `http://localhost:1313/blogs/es/posts/`
+
+**Wrong URLs (HANDLED BY JAVASCRIPT)**:
+- `http://localhost:1313/en/blogs/` → Redirects to `/blogs/en/`
+- `http://localhost:1313/es/blogs/` → Redirects to `/blogs/es/`
+
+### Troubleshooting Multilingual Issues
+
+#### Menu Links Not Working
+1. Check `layouts/partials/extend_head.html` exists
+2. Verify JavaScript console for "URL Fix script loaded"
+3. Check browser console for fix messages
+4. Ensure `layouts/partials/header.html` has correct hardcoded URLs
+
+#### Translation Links 404
+1. Verify `defaultContentLanguageInSubdir = true` in `hugo.toml`
+2. Check content files exist in both `content/en/` and `content/es/`
+3. Ensure no individual `baseURL` in language sections
+
+#### Wrong URL Generation
+1. **DO NOT** try to fix with Hugo template functions - Hugo transforms ALL URLs
+2. **USE** JavaScript solution in `extend_head.html`
+3. **MAINTAIN** hardcoded URLs in `header.html` as fallback
+
+### Development Guidelines
+
+#### When Adding New Menu Items
+1. Add to both English and Spanish menu sections in `hugo.toml`
+2. Use relative paths (e.g., `"newpage/"` not `"/newpage/"`)
+3. Update hardcoded menu in `layouts/partials/header.html`
+4. Test both languages thoroughly
+
+#### When Modifying Theme
+1. **NEVER** modify files in `themes/PaperMod/` directly
+2. **ALWAYS** create overrides in `layouts/` directory
+3. **PRESERVE** existing customizations in `extend_head.html` and `header.html`
+
+#### When Updating PaperMod Theme
+1. **BACKUP** custom files before updating
+2. **TEST** multilingual functionality after update
+3. **VERIFY** JavaScript fixes still work
+4. **CHECK** menu URLs are correct
+
+### Root Cause Documentation
+
+**Why These Customizations Are Needed**:
+- Hugo's `absLangURL` function with `defaultContentLanguageInSubdir = true` and baseURL containing path component creates URL generation conflicts
+- PaperMod theme applies URL transformations that cannot be overridden at template level
+- Hugo processes ALL `href` attributes and applies transformations, even to hardcoded URLs
+- Solution requires multi-layered approach: JavaScript fixes + hardcoded fallbacks + Hugo aliases
+
+**DO NOT ATTEMPT TO**:
+- Fix URLs purely through Hugo configuration
+- Override `absLangURL` behavior in templates
+- Use only static redirects (won't work with Hugo dev server)
+- Modify theme files directly
+
+---
+
+**REMEMBER**: This multilingual setup is complex and interdependent. All customizations work together to provide seamless user experience. Test thoroughly after any changes.
