@@ -77,26 +77,26 @@ buildExpired = false
 
 [[params.socialIcons]]
   name = "github"
-  url = "https://github.com/sebastiansuarezbenjumea"
+  url = "https://github.com/Humanly-Studios"
 
 # English menu
 [languages.en.menu]
   [[languages.en.menu.main]]
     identifier = "home"
     name = "Home"
-    url = "/en/"
+    url = "/"
     weight = 10
     
   [[languages.en.menu.main]]
     identifier = "posts"
     name = "Posts"
-    url = "/en/posts/"
+    url = "/posts/"
     weight = 20
     
   [[languages.en.menu.main]]
     identifier = "about"
     name = "About"
-    url = "/en/about/"
+    url = "/about/"
     weight = 30
 
 # Spanish menu
@@ -104,19 +104,19 @@ buildExpired = false
   [[languages.es.menu.main]]
     identifier = "home"
     name = "Inicio"
-    url = "/es/"
+    url = "/"
     weight = 10
     
   [[languages.es.menu.main]]
     identifier = "posts"
     name = "Artículos"
-    url = "/es/posts/"
+    url = "/posts/"
     weight = 20
     
   [[languages.es.menu.main]]
     identifier = "about"
     name = "Acerca de"
-    url = "/es/about/"
+    url = "/about/"
     weight = 30
 
 [markup]

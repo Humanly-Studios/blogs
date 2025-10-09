@@ -34,13 +34,13 @@ tasks:
     desc: Start Hugo development server
     deps: [stop-hugo]
     cmds:
-      - podman run --rm -it -v {{.SITE_DIR}}:/src:z -p 1313:1313 {{.HUGO_IMAGE}}:{{.HUGO_TAG}} hugo server --bind 0.0.0.0 --buildDrafts --buildFuture
+      - podman run --rm -it -v {{.SITE_DIR}}:/src:z -p 1313:1313 {{.HUGO_IMAGE}}:{{.HUGO_TAG}} hugo server --bind 0.0.0.0 --buildDrafts --buildFuture --baseURL http://localhost:1313/blogs/
 
   serve-prod:
     desc: Start Hugo development server in production mode
     deps: [stop-hugo]
     cmds:
-      - podman run --rm -it -v {{.SITE_DIR}}:/src:z -p 1313:1313 {{.HUGO_IMAGE}}:{{.HUGO_TAG}} hugo server --bind 0.0.0.0 --environment production
+      - podman run --rm -it -v {{.SITE_DIR}}:/src:z -p 1313:1313 {{.HUGO_IMAGE}}:{{.HUGO_TAG}} hugo server --bind 0.0.0.0 --environment production --baseURL http://localhost:1313/blogs/
 
   build:
     desc: Build the Hugo site for production
