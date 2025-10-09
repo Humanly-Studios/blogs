@@ -1,3 +1,61 @@
+{{- /* URL Fix for Menu Home Link Issue */ -}}
+<!-- URL Fix Script for Menu Home Link Issue -->
+<script>
+console.log('URL Fix script loaded');
+(function() {
+    // Fix menu URLs after page load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Fix all menu links
+        var menuLinks = document.querySelectorAll('#menu a');
+        menuLinks.forEach(function(link) {
+            var href = link.getAttribute('href');
+            var text = link.textContent.trim();
+            
+            // Fix Spanish home link
+            if (text === 'Inicio' && href.includes('/es/blogs/')) {
+                link.setAttribute('href', '/blogs/es/');
+                console.log('Fixed Spanish home link:', href, '→', '/blogs/es/');
+            }
+            
+            // Fix English home link
+            if (text === 'Home' && href.includes('/en/blogs/')) {
+                link.setAttribute('href', '/blogs/en/');
+                console.log('Fixed English home link:', href, '→', '/blogs/en/');
+            }
+        });
+    });
+    
+    // Check if current URL matches the wrong pattern for redirect
+    var currentPath = window.location.pathname;
+    console.log('Current path:', currentPath);
+    
+    // Fix wrong Spanish home URL
+    if (currentPath === '/es/blogs/blogs/es/' || currentPath === '/es/blogs/blogs/es') {
+        window.location.replace('/blogs/es/');
+        return;
+    }
+    
+    // Fix wrong English home URL  
+    if (currentPath === '/en/blogs/blogs/en/' || currentPath === '/en/blogs/blogs/en') {
+        window.location.replace('/blogs/en/');
+        return;
+    }
+    
+    // Additional fallback for any similar wrong patterns
+    var wrongPatterns = [
+        { wrong: '/es/blogs/', correct: '/blogs/es/' },
+        { wrong: '/en/blogs/', correct: '/blogs/en/' }
+    ];
+    
+    wrongPatterns.forEach(function(pattern) {
+        if (currentPath.startsWith(pattern.wrong)) {
+            var newPath = currentPath.replace(pattern.wrong, pattern.correct);
+            window.location.replace(newPath);
+        }
+    });
+})();
+</script>
+
 {{- /* Mermaid support */ -}}
 {{- if .Site.Params.mermaid.enable -}}
 <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
