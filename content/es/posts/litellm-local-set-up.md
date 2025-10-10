@@ -110,29 +110,29 @@ task: Available tasks for this project:
    task stop-litellm
    ```
 
-## Request Flow
+## Flujo de Solicitudes
 
-Here's how requests flow through the LiteLLM proxy:
+Así es como fluyen las solicitudes a través del proxy de LiteLLM:
 
 ```mermaid
 sequenceDiagram
-    participant App as Your Application
-    participant Proxy as LiteLLM Proxy
-    participant Config as Config File
-    participant HF as Hugging Face API
-    participant Model as AI Model
+    participant App as Tu Aplicación
+    participant Proxy as Proxy LiteLLM
+    participant Config as Archivo de Config
+    participant HF as API Hugging Face
+    participant Model as Modelo IA
     
     App->>Proxy: POST /chat/completions<br/>{model: "qwen2.5-coder-14b"}
-    Proxy->>Config: Load model configuration
-    Config-->>Proxy: Model endpoint & settings
-    Proxy->>HF: Transform request to HF format
-    HF->>Model: Execute inference
-    Model-->>HF: Model response
-    HF-->>Proxy: API response
-    Proxy->>Proxy: Transform to OpenAI format
-    Proxy-->>App: OpenAI-compatible response
+    Proxy->>Config: Cargar configuración del modelo
+    Config-->>Proxy: Endpoint y configuraciones del modelo
+    Proxy->>HF: Transformar solicitud a formato HF
+    HF->>Model: Ejecutar inferencia
+    Model-->>HF: Respuesta del modelo
+    HF-->>Proxy: Respuesta de la API
+    Proxy->>Proxy: Transformar a formato OpenAI
+    Proxy-->>App: Respuesta compatible con OpenAI
     
-    Note over App,Model: All communication stays local<br/>except model inference
+    Note over App,Model: Toda la comunicación permanece local<br/>excepto la inferencia del modelo
 ```
 
 ## Key Features

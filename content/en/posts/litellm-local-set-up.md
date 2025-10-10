@@ -219,4 +219,4 @@ This setup provides a robust foundation for local AI development with enterprise
 
 # Github repository
 
-[https://github.com/Humanly-Studios/blogs](https://github.com/Humanly-Studios/blogs)
+The code used in this blog can be found in the [Humanly-Studios/blogs/litellms](https://github.com/Humanly-Studios/blogs/tree/main/recipes/litellm) repository.
