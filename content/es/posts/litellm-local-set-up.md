@@ -137,32 +137,32 @@ sequenceDiagram
 
 ## Key Features
 
-### Container Management
-- **`run-litellm`**: Starts the proxy on port 4000
-- **`stop-litellm`**: Cleanly stops and removes container
-- **`restart-litellm`**: Quick restart for config changes
+### Gestión de Contenedores
+- **`run-litellm`**: Inicia el proxy en el puerto 4000
+- **`stop-litellm`**: Detiene y elimina el contenedor de forma limpia
+- **`restart-litellm`**: Reinicio rápido para cambios de configuración
 
-### Testing & Monitoring
-- **`test-litellm`**: Health check endpoint
-- **`test-qwen`**: Tests the Qwen2.5-Coder model specifically
-- **`test-endpoint`**: Direct [Hugging Face endpoint](https://endpoints.huggingface.co/catalog) test
-- **`logs-litellm`**: Real-time container logs
+### Pruebas y Monitoreo
+- **`test-litellm`**: Endpoint de verificación de salud
+- **`test-qwen`**: Prueba específicamente el modelo Qwen2.5-Coder
+- **`test-endpoint`**: Prueba directa del [endpoint de Hugging Face](https://endpoints.huggingface.co/catalog)
+- **`logs-litellm`**: Logs del contenedor en tiempo real
 
-### Development Integration
-- **`setup-env`**: Creates `.env` file for cascade-code integration
-- **`setup-aider`**: Configures Aider AI pair programming tool
-- **`install-aider`**: Installs Aider for AI-assisted coding
+### Integración de Desarrollo
+- **`setup-env`**: Crea archivo `.env` para integración con cascade-code
+- **`setup-aider`**: Configura la herramienta de programación en pareja Aider AI
+- **`install-aider`**: Instala Aider para codificación asistida por IA
 
-## Configuration
+## Configuración
 
-The setup expects:
-- Config file at `config/config.yaml`
-- Environment variables in `.env` file
-- Hugging Face API key for model access
+La configuración requiere:
+- Archivo de configuración en `config/config.yaml`
+- Variables de entorno en archivo `.env`
+- Clave API de Hugging Face para acceso a modelos
 
-### Sample Configuration File config.yaml
+### Archivo de Configuración de Ejemplo config.yaml
 
-Here's the complete [`config.yaml`](https://github.com/Humanly-Studios/blogs/blob/main/recipes/litellm/podman/config/config.yaml) structure used in this setup:
+Aquí está la estructura completa de [`config.yaml`](https://github.com/Humanly-Studios/blogs/blob/main/recipes/litellm/podman/config/config.yaml) utilizada en esta configuración:
 
 ```yaml
 model_list:
@@ -179,34 +179,34 @@ general_settings:
   set_verbose: true
 ```
 
-### Sample .env File
+### Archivo .env de Ejemplo
 
-Here's the complete [`.env`](https://github.com/Humanly-Studios/blogs/blob/main/recipes/litellm/podman/.env) structure used in this setup:
+Aquí está la estructura completa del [`.env`](https://github.com/Humanly-Studios/blogs/blob/main/recipes/litellm/podman/.env) utilizada en esta configuración:
 
 ```env
 LITELLM_PORT=5000
-HUGGINGFACE_API_KEY=your_huggingface_api_key
+HUGGINGFACE_API_KEY=tu_clave_api_huggingface
 ```
 
-**Key Configuration Elements:**
-- **`model_name`**: The identifier you'll use in API requests
-- **`model`**: The actual Hugging Face model path
-- **`api_base`**: Your Hugging Face inference endpoint URL
-- **`api_key`**: References the environment variable for security
-- **`master_key`**: Authentication key for LiteLLM proxy access
-- **`drop_params`**: Ignores unsupported parameters to prevent errors
-- **`set_verbose`**: Enables detailed logging for debugging
+**Elementos Clave de Configuración:**
+- **`model_name`**: El identificador que usarás en las solicitudes de API
+- **`model`**: La ruta real del modelo de Hugging Face
+- **`api_base`**: La URL de tu endpoint de inferencia de Hugging Face
+- **`api_key`**: Hace referencia a la variable de entorno para seguridad
+- **`master_key`**: Clave de autenticación para el acceso al proxy de LiteLLM
+- **`drop_params`**: Ignora parámetros no soportados para prevenir errores
+- **`set_verbose`**: Habilita el registro detallado para depuración
 
-## Why Use This Setup?
+## ¿Por Qué Usar Esta Configuración?
 
-- **Privacy**: Your code and queries stay local
-- **Cost Control**: No per-token charges for local inference
-- **Flexibility**: Easy to switch between different models
-- **Development**: Perfect for AI-assisted coding workflows
+- **Privacidad**: Tu código y consultas se mantienen locales
+- **Control de Costos**: Sin cargos por token para inferencia local
+- **Flexibilidad**: Fácil cambio entre diferentes modelos
+- **Desarrollo**: Perfecto para flujos de trabajo de codificación asistida por IA
 
-## Integration Examples
+## Ejemplos de Integración
 
-Once running, you can use it with any OpenAI-compatible client:
+Una vez en funcionamiento, puedes usarlo con cualquier cliente compatible con OpenAI:
 
 ```bash
 curl -X POST http://localhost:4000/chat/completions \
