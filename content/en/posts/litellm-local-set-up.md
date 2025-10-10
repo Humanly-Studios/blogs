@@ -216,3 +216,7 @@ curl -X POST http://localhost:4000/chat/completions \
 ```
 
 This setup provides a robust foundation for local AI development with enterprise-grade models running on your own infrastructure.
+
+# Github repository
+
+[https://github.com/Humanly-Studios/blogs](https://github.com/Humanly-Studios/blogs)

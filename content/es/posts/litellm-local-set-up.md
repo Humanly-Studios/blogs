@@ -66,7 +66,7 @@ La configuración utiliza un Taskfile.yaml que automatiza:
 
 ### Uso Básico
 
-El [taskfile.yaml](https://github.com/Humanly-Studios/humanly-labs/blob/main/taskfile.yaml) proporciona un flujo de trabajo simple para gestionar el contenedor LiteLLM:
+El [taskfile.yaml](https://github.com/Humanly-Studios/blogs/blob/main/recipes/litellm/podman/Taskfile.yaml) proporciona un flujo de trabajo simple para gestionar el contenedor LiteLLM:
 
 
 ```bash
@@ -216,6 +216,11 @@ curl -X POST http://localhost:4000/chat/completions \
 ```
 
 Esta configuración proporciona una base sólida para el desarrollo de IA local con modelos de nivel empresarial ejecutándose en tu propia infraestructura.
+
+# Repositorio Github
+
+El codigo usado en este blog lo pueden encontrar en el repositorio [Humanly-Studios/blogs/litellms](https://github.com/Humanly-Studios/blogs/tree/main/recipes/litellms).
+
 
 ---
 

@@ -6,7 +6,7 @@ draft: false
 
 # Acerca de Este Blog
 
-¡Bienvenido al blog de Humanly-Labs! Este sitio está construido con Hugo y se despliega automáticamente en GitHub Pages.
+¡Bienvenido al blog de Humanly-Studios! Este sitio está construido con Hugo y se despliega automáticamente en GitHub Pages.
 
 
 ## Contacto
