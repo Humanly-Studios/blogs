@@ -1,0 +1,100 @@
+{{/* Contact Form Partial - Multilingual Support */}}
+{{- $lang := .Page.Language.Lang -}}
+{{- $isSpanish := eq $lang "es" -}}
+
+<div class="contact-form-container">
+  <div class="contact-form-header">
+    <h3>{{ if $isSpanish }}¿Necesitas más información?{{ else }}Need More Information?{{ end }}</h3>
+    <p>{{ if $isSpanish }}Contáctanos y te responderemos lo antes posible.{{ else }}Contact us and we'll get back to you as soon as possible.{{ end }}</p>
+  </div>
+  
+  <form class="contact-form" action="{{ site.Params.contactForm.formBackendUrl | default "https://formsubmit.co/your-email@example.com" }}" method="POST">
+    <!-- Hidden fields for form configuration -->
+    <input type="hidden" name="_subject" value="{{ if $isSpanish }}Nueva consulta desde el blog{{ else }}New inquiry from blog{{ end }}">
+    <input type="hidden" name="_language" value="{{ $lang }}">
+    <input type="hidden" name="_next" value="{{ .Page.Permalink }}?submitted=true">
+    <input type="hidden" name="_captcha" value="false">
+    <!-- Form fields -->
+    <div class="form-group">
+      <label for="name">{{ if $isSpanish }}Nombre *{{ else }}Name *{{ end }}</label>
+      <input type="text" id="name" name="name" required 
+             placeholder="{{ if $isSpanish }}Tu nombre completo{{ else }}Your full name{{ end }}">
+    </div>
+    
+    <div class="form-group">
+      <label for="email">{{ if $isSpanish }}Correo electrónico *{{ else }}Email *{{ end }}</label>
+      <input type="email" id="email" name="email" required 
+             placeholder="{{ if $isSpanish }}tu@email.com{{ else }}your@email.com{{ end }}">
+    </div>
+    
+    <div class="form-group">
+      <label for="company">{{ if $isSpanish }}Empresa{{ else }}Company{{ end }}</label>
+      <input type="text" id="company" name="company" 
+             placeholder="{{ if $isSpanish }}Nombre de tu empresa (opcional){{ else }}Your company name (optional){{ end }}">
+    </div>
+    
+    <div class="form-group">
+      <label for="subject">{{ if $isSpanish }}Asunto *{{ else }}Subject *{{ end }}</label>
+      <select id="subject" name="subject" required>
+        <option value="">{{ if $isSpanish }}Selecciona un tema{{ else }}Select a topic{{ end }}</option>
+        {{ if $isSpanish }}
+        <option value="Consulta general">Consulta general</option>
+        <option value="Servicios">Información sobre servicios</option>
+        <option value="Colaboración">Oportunidades de colaboración</option>
+        <option value="Soporte técnico">Soporte técnico</option>
+        <option value="Otro">Otro</option>
+        {{ else }}
+        <option value="General inquiry">General inquiry</option>
+        <option value="Services">Service information</option>
+        <option value="Partnership">Partnership opportunities</option>
+        <option value="Technical support">Technical support</option>
+        <option value="Other">Other</option>
+        {{ end }}
+      </select>
+    </div>
+    
+    <div class="form-group">
+      <label for="message">{{ if $isSpanish }}Mensaje *{{ else }}Message *{{ end }}</label>
+      <textarea id="message" name="message" rows="5" required 
+                placeholder="{{ if $isSpanish }}Cuéntanos más sobre tu consulta...{{ else }}Tell us more about your inquiry...{{ end }}"></textarea>
+    </div>
+    
+    <!-- Post context information -->
+    <input type="hidden" name="_post_title" value="{{ .Page.Title }}">
+    <input type="hidden" name="_post_url" value="{{ .Page.Permalink }}">
+    
+    <div class="form-actions">
+      <button type="submit" class="submit-btn">
+        <span class="btn-text">{{ if $isSpanish }}Enviar mensaje{{ else }}Send message{{ end }}</span>
+        <span class="btn-loading" style="display: none;">{{ if $isSpanish }}Enviando...{{ else }}Sending...{{ end }}</span>
+      </button>
+    </div>
+  </form>
+  
+  <!-- Success message (shown via URL parameter) -->
+  <div class="form-success" style="display: none;">
+    <div class="success-icon">✓</div>
+    <h4>{{ if $isSpanish }}¡Mensaje enviado!{{ else }}Message sent!{{ end }}</h4>
+    <p>{{ if $isSpanish }}Gracias por contactarnos. Te responderemos pronto.{{ else }}Thank you for contacting us. We'll get back to you soon.{{ end }}</p>
+  </div>
+</div>
+
+<script>
+// Show success message if form was submitted
+if (window.location.search.includes('submitted=true')) {
+  document.querySelector('.contact-form').style.display = 'none';
+  document.querySelector('.form-success').style.display = 'block';
+}
+
+// Form submission handling
+document.querySelector('.contact-form').addEventListener('submit', function(e) {
+  const submitBtn = this.querySelector('.submit-btn');
+  const btnText = submitBtn.querySelector('.btn-text');
+  const btnLoading = submitBtn.querySelector('.btn-loading');
+  
+  // Show loading state
+  btnText.style.display = 'none';
+  btnLoading.style.display = 'inline';
+  submitBtn.disabled = true;
+});
+</script>

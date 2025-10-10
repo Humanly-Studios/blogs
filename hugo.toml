@@ -145,5 +145,11 @@ buildExpired = false
 [params.mermaid]
   enable = true
 
+# Contact form configuration
+[params.contactForm]
+  # FormBackend URL will be injected via environment variable during build
+  # For local development, use a placeholder or test URL
+  formBackendUrl = "https://formsubmit.co/your-email@example.com"
+
 [outputs]
   home = ["HTML", "RSS", "JSON"]
