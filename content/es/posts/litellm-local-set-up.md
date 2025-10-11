@@ -219,7 +219,7 @@ Esta configuración proporciona una base sólida para el desarrollo de IA local 
 
 # Repositorio Github
 
-El codigo usado en este blog lo pueden encontrar en el repositorio [Humanly-Studios/blogs/litellms](https://github.com/Humanly-Studios/blogs/tree/main/recipes/litellms).
+El codigo usado en este blog lo pueden encontrar en el repositorio [Humanly-Studios/blogs/litellms](https://github.com/Humanly-Studios/blogs/tree/main/recipes/litellm).
 
 
 ---
