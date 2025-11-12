@@ -1,5 +1,22 @@
+
+
+
+
 using a git like approach,  the use of LLM in data engineering is easier (explore)
 
+* https://github.com/datopian/metastore-lib (interesting for dataset publishing, the company have products just for that)
+* Reference URL:
+https://lakefs.io/blog/iceberg-catalog/
+
+​
+
+This project builds on ideas found in metastore-lib but is newer, actively developed, and focused on data lake metadata and dataset versioning. It fits well as a lightweight metastore alternative with branching features for Apache Iceberg proof-of-concept or development scenarios.
+
+Summary:
+For a simple or local-first metastore capable of versioning and branching metadata (and data) with Apache Iceberg integration, lakeFS is a strong, newer alternative to datopian/metastore-lib, designed specifically for data lakes and Iceberg catalogs.
+
+
+# Git like for data engineering
 
 There are several research papers, articles, and tools that follow a similar approach to Bauplan's paradigm of "Git for Data" and modular versioned pipelines with branching, Write-Audit-Publish patterns, and lakehouse versioning:
 
